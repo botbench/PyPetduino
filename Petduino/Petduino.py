@@ -94,12 +94,7 @@ class Petduino(object):
 		return
 
 	def getButton(self, button):
-		self.ser.write("%d;" % (self.GET_LIGHT_LEVEL_ACTION))
-		data = self.readReply()
-		if data[0] != '%d' % self.LIGHT_LEVEL_EVENT:
-			sys.stderr.write("Wrong event returned!\n");
-		else:
-			sys.stderr.write("Current light level: %s\n" % data[1])
+		return
 
 	def printData(farg, *args):
 		print "formal arg:", farg
