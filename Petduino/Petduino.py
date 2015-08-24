@@ -110,12 +110,21 @@ class Petduino(object):
 		return
 
 	def getTemperature(self):
+		temp = 0.0
 		self.ser.write("%d;" % (self.GET_TEMPERATURE_ACTION))
 		data = self.readReply()
 		if data[0] != '%d' % self.TEMPERATURE_EVENT:
 			sys.stderr.write("Wrong event returned!\n");
-		else:
-			sys.stderr.write("Current temp: %s\n" % data[1])
+		#else:
+		#	sys.stderr.write("Current temp: %s\n" % data[1])
+
+		try:
+			temp = float(data[1])
+		except ValueError:
+			temp = 0.0
+
+		return temp
+
 
 	def getLightLevel(self):
 		self.ser.write("%d;" % (self.GET_LIGHT_LEVEL_ACTION))

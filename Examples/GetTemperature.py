@@ -12,7 +12,8 @@ def main():
 		sys.exit()
 
 	while True:
-		pet.getTemperature()
+		temp = pet.getTemperature()
+		print "Temp : %f" % temp
 		sleep(1)
 
 
