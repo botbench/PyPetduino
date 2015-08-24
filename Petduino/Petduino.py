@@ -1,5 +1,7 @@
 ﻿import serial
 import sys
+import ConfigParser
+
 from time import sleep
 
 class UnhappyPetduino(Exception):
@@ -29,11 +31,41 @@ class Petduino(object):
 	BUTTON_1_EVENT					= 4
 	BUTTON_2_EVENT					= 5
 
-	def __init__ (self, serialPort, baudrate):
+	#def __init__ (self, serialPort, baudrate):
+	#	try:
+	#		self.ser = serial.Serial(serialPort, baudrate, timeout=1)
+	#	except IOError:
+	#		raise UnhappyPetduino("Could not open %s" % serialPort)
+	#		return
+	#	# The sleep is necessary to allow the serial port to open and the Petduino to start up
+	#	sleep(2)
+
+	#	# Absorb the first line of garbage
+	#	self.readReply()
+
+	def __init__ (self, configfile):
+		self.configfile = configfile
+
+		cfgparser = ConfigParser.ConfigParser()
+		cfgparser.readfp(open(configfile))
+
+		if not cfgparser.has_section('Serial'):
+			raise UnhappyPetduino("Config file %s has no Serial section" % configfile)
+
+		if not cfgparser.has_option('Serial', 'port'):
+			raise UnhappyPetduino("Config file %s has no port value" % configfile)
+		else:
+			port = cfgparser.get('Serial', 'port')
+
+		if not cfgparser.has_option('Serial', 'baud'):
+			raise UnhappyPetduino("Config file %s has no baud value" % configfile)
+		else:
+			baud = cfgparser.getint('Serial', 'baud')
+
 		try:
-			self.ser = serial.Serial(serialPort, baudrate, timeout=1)
+			self.ser = serial.Serial(port, baud, timeout=1)
 		except IOError:
-			raise UnhappyPetduino("Could not open %s" % serialPort)
+			raise UnhappyPetduino("Could not open %s" % port)
 			return
 		# The sleep is necessary to allow the serial port to open and the Petduino to start up
 		sleep(2)

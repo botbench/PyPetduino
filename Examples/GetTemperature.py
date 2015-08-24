@@ -5,7 +5,7 @@ import sys
 
 def main():
 	try:
-		pet = Petduino.Petduino('COM4', 9600)
+		pet = Petduino.Petduino('.\petduino.cfg')
 	except Petduino.UnhappyPetduino as sadness:
 		print "There is a disturbance in the force: %s" % sadness
 		sys.stdin.read()
