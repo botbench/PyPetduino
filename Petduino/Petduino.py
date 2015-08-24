@@ -11,6 +11,7 @@ class UnhappyPetduino(Exception):
 
 class Petduino(object):
 
+	# For PC -> Petduino 
 	SET_STATE_ACTION				= 0
 	GET_STATE_ACTION				= 1
 	SET_LED_ACTION					= 2
@@ -20,6 +21,7 @@ class Petduino(object):
 	GET_LIGHT_LEVEL_ACTION	= 6
 	SET_DATA_ACTION					= 7
 
+	# For Petduino -> PC
 	STATE_EVENT							= 0
 	LED_EVENT								= 1
 	TEMPERATURE_EVENT				= 2
@@ -27,15 +29,16 @@ class Petduino(object):
 	BUTTON_1_EVENT					= 4
 	BUTTON_2_EVENT					= 5
 
-
-
 	def __init__ (self, serialPort, baudrate):
 		try:
 			self.ser = serial.Serial(serialPort, baudrate, timeout=1)
 		except IOError:
 			raise UnhappyPetduino("Could not open %s" % serialPort)
 			return
+		# The sleep is necessary to allow the serial port to open and the Petduino to start up
 		sleep(2)
+
+		# Absorb the first line of garbage
 		self.readReply()
 
 	def flush(self):
