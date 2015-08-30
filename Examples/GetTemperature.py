@@ -16,6 +16,5 @@ def main():
 		print "Temp : %f" % temp
 		sleep(1)
 
-
 if __name__ == "__main__":
   main()
