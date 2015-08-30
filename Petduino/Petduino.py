@@ -1,6 +1,7 @@
 ﻿import serial
 import sys
 import ConfigParser
+import thread
 
 from time import sleep
 
@@ -43,8 +44,16 @@ class Petduino(object):
 	#	# Absorb the first line of garbage
 	#	self.readReply()
 
-	def __init__ (self, configfile):
+	def __init__ (self, configfile, commands = None):
 		self.configfile = configfile
+
+		self.commands = [None, None, None, None, None, None]
+
+		self.start_thread = False
+
+		if commands is not None and len(commands) == 6:
+			self.commands = commands
+			self.start_thread = True
 
 		cfgparser = ConfigParser.ConfigParser()
 		cfgparser.readfp(open(configfile))
@@ -67,11 +76,40 @@ class Petduino(object):
 		except IOError:
 			raise UnhappyPetduino("Could not open %s" % port)
 			return
-		# The sleep is necessary to allow the serial port to open and the Petduino to start up
-		sleep(2)
 
-		# Absorb the first line of garbage
-		self.readReply()
+		if self.start_thread:
+			thread.start_new_thread(self.processSerialReads, ())
+		else:
+			# The sleep is necessary to allow the serial port to open and the Petduino to start up
+			sleep(2)
+			# get rid of the initial garbage
+			self.readReply()
+
+	def setCallback(self, event, callback):
+		self.commands[event] = callback
+		if self.start_thread == False:
+			thread.start_new_thread(self.processSerialReads, ())
+			self.start_thread = True
+
+	def execCallback(self, data):
+		if data is not None and data[0] is not None and self.commands[data[0]] is not None:
+			self.commands[data[0]](data)
+
+	def processSerialReads(self):
+		while True:
+			data = self.readReply()
+			if data is not None and len(data) > 0:
+				# Convert the first string into an actual number, if not, discard the whole line
+				if data[0].isdigit():
+					data[0] = int(data[0])
+				else:
+					continue
+
+				try:
+					self.execCallback(data)
+				except Exception as e:
+					raise UnhappyPetduino("Could not execute callback for %s" % e.message)
+
 
 	def flush(self):
 		self.ser.flushInput()
@@ -82,8 +120,7 @@ class Petduino(object):
 		data = ""
 		line = self.ser.readline()
 		if len(line) > 0:
-			line = line.rstrip(';\r\n')
-			print line.split(',')
+			line = line.strip(';\r\n')
 			return line.split(',')
 
 
@@ -96,11 +133,11 @@ class Petduino(object):
 	def setLed(self, onoroff):
 		if (onoroff == 0) or (onoroff == 1):
 			self.ser.write("%d, %d;" % (self.SET_LED_ACTION, onoroff))
-			data = self.readReply()
-			if data[0] != '%d' % self.LED_EVENT:
-				sys.stderr.write("Wrong event returned!\n");
-			else:
-				sys.stderr.write("Current state of LED: %s\n" % data[1])
+			#data = self.readReply()
+			#if data is None or data[0] != '%d' % self.LED_EVENT:
+			#	sys.stderr.write("Wrong event returned!\n");
+			#else:
+			#	sys.stderr.write("Current state of LED: %s\n" % data[1])
 
 	def toggleLed(self):
 		data = "%d;" % (self.TOGGLE_LED_ACTION)
@@ -113,7 +150,7 @@ class Petduino(object):
 		temp = 0.0
 		self.ser.write("%d;" % (self.GET_TEMPERATURE_ACTION))
 		data = self.readReply()
-		if data[0] != '%d' % self.TEMPERATURE_EVENT:
+		if data is None or data[0] != '%d' % self.TEMPERATURE_EVENT:
 			sys.stderr.write("Wrong event returned!\n");
 		#else:
 		#	sys.stderr.write("Current temp: %s\n" % data[1])
@@ -129,7 +166,7 @@ class Petduino(object):
 	def getLightLevel(self):
 		self.ser.write("%d;" % (self.GET_LIGHT_LEVEL_ACTION))
 		data = self.readReply()
-		if data[0] != '%d' % self.LIGHT_LEVEL_EVENT:
+		if data is None or data[0] != '%d' % self.LIGHT_LEVEL_EVENT:
 			sys.stderr.write("Wrong event returned!\n");
 		else:
 			sys.stderr.write("Current light level: %s\n" % data[1])

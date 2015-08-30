@@ -21,6 +21,9 @@
     <PtvsTargetsFile>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets</PtvsTargetsFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Examples\Callbacks.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Examples\GetTemperature.py" />
     <Compile Include="Examples\BlinkLed.py" />
     <Compile Include="Petduino\Petduino.py" />
