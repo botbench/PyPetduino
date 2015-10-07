@@ -172,7 +172,7 @@ class Petduino(object):
 			sys.stderr.write("Current light level: %s\n" % data[1])
 
 	def setData(self, data):
-		return
+		self.ser.write("%d,%s;" % (self.SET_DATA_ACTION, data))
 
 	def getButton(self, button):
 		return

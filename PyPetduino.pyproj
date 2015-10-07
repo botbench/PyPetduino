@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{cff698e5-a3f7-4202-800f-126ab8f7e96e}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>Examples\BlinkLed.py</StartupFile>
+    <StartupFile>Examples\MailAnimation.py</StartupFile>
     <SearchPath>Petduino\;..\..\..\..\..\Python27\Lib\site-packages\</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -26,6 +26,9 @@
     </Compile>
     <Compile Include="Examples\GetTemperature.py" />
     <Compile Include="Examples\BlinkLed.py" />
+    <Compile Include="Examples\MailAnimation.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Petduino\Petduino.py" />
   </ItemGroup>
   <ItemGroup>
